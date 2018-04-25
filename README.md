@@ -1,0 +1,2 @@
+# gstProyect
+Proyecto Gstreamer
