@@ -1,0 +1,22 @@
+gst-launch-1.0 filesrc location=video.mp4 ! qtdemux name=demux demux.! queue ! faad !  audioconvert ! alsasink  demux. ! queue ! avdec_h264 ! videoconvert ! ximagesink
+
+
+detectar cara GST_FACEDETECT_UPDATES_ON_FACE Send bus update messages when a face is detected
+
+
+
+// Load the [[HaarClassifierCascade]]
+cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
+
+// Check whether the cascade has loaded successfully. Else report and error and quit
+if( !cascade )
+{
+fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
+return -1;
+}
+
+//////////////////////
+
+conectarse en remoto
+
+ssh -X usuario@monitor01.lab.it.uc3m.es
