@@ -1,5 +1,11 @@
 gst-launch-1.0 filesrc location=video.mp4 ! qtdemux name=demux demux.! queue ! faad !  audioconvert ! alsasink  demux. ! queue ! avdec_h264 ! videoconvert ! ximagesink
 
+//con facedetect
+gst-launch-1.0 filesrc location=video2.mp4 ! qtdemux name=demux demux. ! queue ! avdec_h264 ! videoconvert ! facedetect profile=haarcascade_frontalface_default.xml ! videoconvert ! ximagesink
+
+
+
+
 
 detectar cara GST_FACEDETECT_UPDATES_ON_FACE Send bus update messages when a face is detected
 
