@@ -1,4 +1,11 @@
 /*
+
+Alejandro Enrique Trigueros Alvarez, 100306255
+Francisco Javier Castellano Farrak, 100346323
+
+*/
+
+/*
 ============================================================================
 Compilation:
 gcc -Wall <program>.c -o <program> $(pkg-config --cflags --libs gstreamer-1.0)
@@ -62,9 +69,8 @@ static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
       }
       
       case GST_MESSAGE_ELEMENT:{
-      
+
       	/*ESCTRUCTURA DE MENSAJE DE FACEDETECT
-      
       	Se obtuvo el mensaje nº 361 del elemento «facedetect0» 
       	(element): facedetect, 
       			timestamp=(guint64)7173833333, 
@@ -75,7 +81,6 @@ static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
       			{ 
       				"face\,\ x\=\(uint\)188\,\ y\=\(uint\)10\,\ width\=\(uint\)89\,\ height\=\(uint\)89\;"
       			};
-
      	 */
       
      	const GstStructure *structure;
