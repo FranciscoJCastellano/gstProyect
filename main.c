@@ -35,9 +35,8 @@ int estado = 0;
 *  Bus message handler
 * --------------------------------------------------------------------- */
 static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
-  {
-	//procesamiento de los mensajes
-    GMainLoop *loop = (GMainLoop *) data;
+{//procesamiento de los mensajes
+	GMainLoop *loop = (GMainLoop *) data;
     char *src = GST_MESSAGE_SRC_NAME(msg);
 
     switch (GST_MESSAGE_TYPE (msg)) {
@@ -48,7 +47,7 @@ static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
       break;
 
       case GST_MESSAGE_ERROR: {
-        gchar  *debug;
+      	gchar  *debug;
         GError *error;
 
         gst_message_parse_error (msg, &error, &debug);
@@ -64,10 +63,10 @@ static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
       
       case GST_MESSAGE_ELEMENT:{
       
-      /*ESCTRUCTURA DE MENSAJE DE FACEDETECT
+      	/*ESCTRUCTURA DE MENSAJE DE FACEDETECT
       
-      Se obtuvo el mensaje nº 361 del elemento «facedetect0» 
-      (element): facedetect, 
+      	Se obtuvo el mensaje nº 361 del elemento «facedetect0» 
+      	(element): facedetect, 
       			timestamp=(guint64)7173833333, 
       			stream-time=(guint64)7173833333, 
       			running-time=(guint64)7173833333, 
@@ -77,55 +76,76 @@ static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
       				"face\,\ x\=\(uint\)188\,\ y\=\(uint\)10\,\ width\=\(uint\)89\,\ height\=\(uint\)89\;"
       			};
 
-      */
+     	 */
       
-      
-      const GstStructure *structure;
-      const gchar *name;
-      const GValue *value;
-      const gchar *faces;
-      const GValue *timestamp;
-      const gchar *ts;
-      
-      	/* parse msg structure */
+     	const GstStructure *structure;
+      	const gchar *name;
+      	const GValue *faces;
+      	const GValue *timestamp;
+      	const gchar *ts;
+      	guint numFaces;
+      	const GValue *faceValue;
+      	const GstStructure *faceStructure;
+      	
+      	guint posX;
+      	guint posY;
+      	guint height;
+      	guint width;
+      	
+		
 		structure = gst_message_get_structure(msg);
 		name = gst_structure_get_name(structure);
 		timestamp = gst_structure_get_value(structure,"timestamp");
-		/* get structure of faces */
-    	value = gst_structure_get_value (structure, "faces");
+    	faces = gst_structure_get_value (structure, "faces");
     	
-      if (structure && strcmp(name,"facedetect") == 0) 
-      {
-        g_print ("\nbus... type: %s || name: %s",src,name);
-        
-        
-        
-        //g_print (" timestamp: %" G_GUINT64_FORMAT "\n", ts);
-        ts = g_strdup_value_contents(timestamp);
-        g_print("|| timestamp: %s",ts);
-        
-        faces = g_strdup_value_contents(value);
-        g_print("\n|| faces: %s\n",faces);
+    	
+    	
+     	 if (structure && strcmp(name,"facedetect") == 0) 
+     	 {
+      		ts = g_strdup_value_contents(timestamp);
+      		numFaces = gst_value_list_get_size (faces);
+     	 	g_print ("\nDeteccion  (%s):",ts);
+      	 	g_print(" [%i] ",numFaces);
+      	 	
+      	 	gint r=0;
+      	 	for (r=0;r < numFaces;r++)
+      	 	{
+      	 		faceValue = gst_value_list_get_value(faces,r);
+      	 		faceStructure = gst_value_get_structure(faceValue);
+      	 		
+      	 		gboolean b ;
+      	 		b = gst_structure_get_uint(faceStructure,"x", &posX);
+      	 		b = gst_structure_get_uint(faceStructure,"y", &posY);
+      	 		b = gst_structure_get_uint(faceStructure,"width", &width);
+      	 		b = gst_structure_get_uint(faceStructure,"height", &height);
+      	 		
+      	 		if (b)
+      	 		{
+      	 			g_print("{ x=%i, y=%i , h=%i ,w=%i  }",posX, posY, width, height);
+      	 		}
+      	 	
+      	 	}
+      	 	
+      	
        
         
-        /* print msg structure names and type */
-      //gint i;
-      //for (i = 0; i < gst_structure_n_fields (structure); i++) 
-      //{
-      //  const gchar *n = gst_structure_nth_field_name (structure, i);
-      //  GType type = gst_structure_get_field_type (structure, n);
-      //  g_print ("\n-Name field, type: %s[%s]", n, g_type_name(type));
-      //}
+       	 	/* print msg structure names and type */
+     	 //gint i;
+     	 //for (i = 0; i < gst_structure_n_fields (structure); i++) 
+     	 //{
+     	 //  const gchar *n = gst_structure_nth_field_name (structure, i);
+     	 //  GType type = gst_structure_get_field_type (structure, n);
+     	 //  g_print ("\n-Name field, type: %s[%s]", n, g_type_name(type));
+     	 //}
         
-        
-      }
-        break;
+      	}
+      break;
         
       }
 
       default: {
         //g_print ("..[bus].. %15s :: %-15s\n", src, GST_MESSAGE_TYPE_NAME(msg));
-        break;
+      break;
       }
     }
 
@@ -228,6 +248,7 @@ static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
 
         /* set the input filename for haar cascade file*/
         g_object_set(G_OBJECT(facedet), "profile","haarcascade_frontalface_default.xml",NULL);
+        /* set the update messages of facedetect when a face is detected: 2 */
         g_object_set(G_OBJECT(facedet), "updates",2,NULL);
 
         /* set the name for the demuxer element */
@@ -242,16 +263,10 @@ static gboolean bus_call (GstBus     *bus, GstMessage *msg, gpointer data)
 
 
         /* Add elements to pipeline */
-        gst_bin_add_many(GST_BIN(pipeline), source, demuxer, queue_aud, aud_dec, queue_img, img_dec, vid_conv_in, facedet, vid_conv_out, f_audioconv, aud_sink, img_sink, NULL);
+        gst_bin_add_many(GST_BIN(pipeline), source, demuxer, queue_aud, aud_dec, queue_img, img_dec, vid_conv_in, 			facedet, vid_conv_out, f_audioconv, aud_sink, img_sink, NULL);
 
         /* Link elements */
 
-        /* note that the demuxer will be linked to the decoder dynamically.
-        The reason is that Ogg may contain various streams (for example
-        audio and video). The source pad(s) will be created at run time,
-        by the demuxer when it detects the amount and nature of streams.
-        Therefore we connect a callback function which will be executed
-        when the "pad-added" is emitted.*/
 
         /* demuxer src pad is created dinamically -> needs to be linked later */
         gst_element_link (source, demuxer);
